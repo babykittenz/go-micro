@@ -5,6 +5,18 @@
 		},
 		{
 			"path": "broker-service"
+		},
+		{
+			"path": "project"
+		},
+		{
+			"path": "authentication-service"
+		},
+		{
+			"path": "logger-service"
+		},
+		{
+			"path": "mail-service"
 		}
 	]
 }

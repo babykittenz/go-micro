@@ -11,7 +11,7 @@ type JSONPayload struct {
 }
 
 func (app *Config) WriteLog(w http.ResponseWriter, r *http.Request) {
-	// read the json in to a var
+	// read json into var
 	var requestPayload JSONPayload
 	_ = app.readJSON(w, r, &requestPayload)
 
@@ -28,10 +28,9 @@ func (app *Config) WriteLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := jsonResponse{
-		Error:   false,
-		Message: "Logged",
+		Error: false,
+		Message: "logged",
 	}
 
 	app.writeJSON(w, http.StatusAccepted, resp)
-
 }
