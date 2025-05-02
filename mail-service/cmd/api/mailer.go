@@ -31,6 +31,7 @@ type Message struct {
 	DataMap     map[string]any
 }
 
+// SendSMTPMessage sends an email message using SMTP, with support for HTML and plain text formats and optional attachments.
 func (m *Mail) SendSMTPMessage(msg Message) error {
 	if msg.From == "" {
 		msg.From = m.FromAddress
@@ -40,7 +41,7 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 		msg.FromName = m.FromName
 	}
 
-	data := map[string]any {
+	data := map[string]any{
 		"message": msg.Data,
 	}
 
@@ -91,10 +92,11 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 		log.Println(err)
 		return err
 	}
-	
+
 	return nil
 }
 
+// buildHTMLMessage generates an HTML email message by rendering a template with provided data and inlines CSS rules.
 func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 	templateToRender := "./templates/mail.html.gohtml"
 
@@ -117,6 +119,7 @@ func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 	return formattedMessage, nil
 }
 
+// buildPlainTextMessage generates a plain text email by rendering the specified template with the provided data.
 func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 	templateToRender := "./templates/mail.plain.gohtml"
 
@@ -137,8 +140,8 @@ func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 
 func (m *Mail) inlineCSS(s string) (string, error) {
 	options := premailer.Options{
-		RemoveClasses: false,
-		CssToAttributes: false,
+		RemoveClasses:     false,
+		CssToAttributes:   false,
 		KeepBangImportant: true,
 	}
 

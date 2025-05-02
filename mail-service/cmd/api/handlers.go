@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -22,11 +25,11 @@ func (app *Config) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg := Message {
-		From: requestPayload.From,
-		To: requestPayload.To,
+	msg := Message{
+		From:    requestPayload.From,
+		To:      requestPayload.To,
 		Subject: requestPayload.Subject,
-		Data: requestPayload.Message,
+		Data:    requestPayload.Message,
 	}
 
 	err = app.Mailer.SendSMTPMessage(msg)
@@ -36,10 +39,38 @@ func (app *Config) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := jsonResponse {
-		Error: false,
+	err = app.logRequest("mail", fmt.Sprintf("%s sent an email to %s", msg.To, msg.From))
+
+	payload := jsonResponse{
+		Error:   false,
 		Message: "sent to " + requestPayload.To,
 	}
 
 	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) logRequest(name, data string) error {
+	var entry struct {
+		Name string `json:"name"`
+		Data string `json:"data"`
+	}
+
+	entry.Name = name
+	entry.Data = data
+
+	jsonData, _ := json.MarshalIndent(entry, "", "\t")
+	logServiceURL := "http://logger-service/log"
+
+	request, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+
+	client := &http.Client{}
+	_, err = client.Do(request)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
